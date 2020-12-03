@@ -2,6 +2,7 @@ class Password
   attr_accessor :policy_letter, :policy_constraint1, :policy_constraint2, :letter_counts
 
   def initialize(policy_password_s)
+    # Ex. "1-8 n: dpwpmhknmnlglhjtrbpx"
     regex = /([[:digit:]]+)\-([[:digit:]]+) ([[:alpha:]]): ([[:alpha:]]+)/
     match = regex.match(policy_password_s)
     @policy_constraint1 = match[1].to_i
