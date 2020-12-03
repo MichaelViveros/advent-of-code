@@ -21,7 +21,11 @@ def multiply_three_sum(expense_counts)
     end
 end
 
-
+# input.txt:
+# 1918
+# 1869
+# 1821
+# ...
 def get_expense_counts()
     f = File.new("input.txt")
     f.readlines.reduce(Hash.new(0)) { |hash, line| hash.tap { |h| h[line.to_i] += 1 } }
