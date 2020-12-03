@@ -2,16 +2,17 @@ class Password
   attr_accessor :policy_letter, :policy_constraint1, :policy_constraint2, :letter_counts
 
   def initialize(policy_password_s)
-    policy, password = policy_password_s.split(':')
-    constraints, @policy_letter = policy.split(' ')
-    @policy_constraint1, @policy_constraint2 = constraints.split('-').map(&:to_i)
-    @password = password.strip
-    @letter_counts = @password.chars.reduce(Hash.new(0)) { |hash, c| hash.tap { |h| h[c] += 1 } }
+    regex = /([[:digit:]]+)\-([[:digit:]]+) ([[:alpha:]]): ([[:alpha:]]+)/
+    match = regex.match(policy_password_s)
+    @policy_constraint1 = match[1].to_i
+    @policy_constraint2 = match[2].to_i
+    @policy_letter = match[3]
+    @password = match[4]
+    @letter_count = @password.count(@policy_letter)
   end
 
   def valid1?
-    count = @letter_counts[@policy_letter]
-    count >= @policy_constraint1 && count <= @policy_constraint2
+    @letter_count >= @policy_constraint1 && @letter_count <= @policy_constraint2
   end
 
   def valid2?
