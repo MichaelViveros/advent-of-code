@@ -20,6 +20,10 @@ class Password
   end
 end
 
+# input:
+# 1-8 n: dpwpmhknmnlglhjtrbpx
+# 11-12 n: frpknnndpntnncnnnnn
+# 4-8 t: tmttdtnttkr
 f = File.new("input.txt")
 passwords = f.readlines.map { |l| Password.new(l) }
 puts passwords.count(&:valid1?)
