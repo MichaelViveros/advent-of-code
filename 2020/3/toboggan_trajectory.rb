@@ -1,25 +1,32 @@
 TREE = '#'
 OPEN = '.'
+SLOPE = [3, 1]
+SLOPES = [[1, 1], SLOPE, [5, 1], [7, 1], [1, 2]]
 
-def trees_on_path(map)
-  rows_size = map.size
-  columns_size = map[0].size
-  # path is a series of slopes where each slope moves right 3 and down 1
-  # path ends when we reach last row, so there's rows_size slopes in total
-  rows = (1..rows_size - 1)
-  # columns repeat forever but we only get the initial set of columns
-  # so we have to take modulo
-  columns = (1..rows_size - 1).map { |c| c * 3 % columns_size }
-  # [[1, 3], [2, 6], ...]
-  rows.zip(columns).reduce(0) do |sum, (row, column)|
-    map[row][column] == TREE ? sum + 1 : sum
-  end
+def trees_on_path(map, slope)
+  num_rows = map.size
+  num_columns = map[0].size
+  slope_right, slope_down = slope
+  # path is a sequence of stops where each stop moves slope_right right and slope_down down
+  # since we start in the first row, there are num_rows - 1 rows left to traverse
+  num_stops = (num_rows - 1) / slope_down
+  rows = (1..num_stops).map { |r| r * slope_down }
+  # the columns repeat forever but our map only contains the initial set of columns
+  # so we have to modulo the current column with num_columns
+  columns = (1..num_stops).map { |c| c * slope_right % num_columns }
+  rows.zip(columns).count { |(row, column)| map[row][column] == TREE }
+end
+
+def multiply_paths(map, slopes)
+  slopes.map { |s| trees_on_path(map, s) }
+    .reduce(:*)
 end
 
 # input:
 # ..##.......
 # #...#...#..
-# ...
+# _more lines_
 f = File.new("input.txt")
 map = f.readlines.map { |l| l.strip.chars }
-puts trees_on_path(map)
+puts multiply_paths(map, [SLOPE])
+puts multiply_paths(map, SLOPES)
