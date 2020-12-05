@@ -20,5 +20,8 @@ def binary_partition(seat)
 end
 
 f = File.new('input.txt')
-max_seat_id = f.readlines.map { |l| binary_partition(l) }.max
-puts max_seat_id
+seats = f.readlines.map { |l| binary_partition(l) }
+puts seats.max
+seats.sort!
+seat, _index = seats.each_with_index.find { |s, i| seats[i + 1] != s + 1 }
+puts seat + 1
