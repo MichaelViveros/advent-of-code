@@ -1,5 +1,6 @@
 class Password
-  attr_accessor :policy_letter, :policy_constraint1, :policy_constraint2, :letter_counts
+  attr_reader :policy_letter, :policy_constraint1,
+              :policy_constraint2, :letter_counts
 
   def initialize(policy_password_s)
     # Ex. "1-8 n: dpwpmhknmnlglhjtrbpx"
@@ -13,11 +14,13 @@ class Password
   end
 
   def valid1?
-    @letter_count >= @policy_constraint1 && @letter_count <= @policy_constraint2
+    @letter_count >= @policy_constraint1 &&
+      @letter_count <= @policy_constraint2
   end
 
   def valid2?
-    (@password[@policy_constraint1 - 1] == @policy_letter) ^ (@password[@policy_constraint2 - 1] == @policy_letter)
+    (@password[@policy_constraint1 - 1] == @policy_letter) ^
+      (@password[@policy_constraint2 - 1] == @policy_letter)
   end
 end
 
@@ -25,7 +28,7 @@ end
 # 1-8 n: dpwpmhknmnlglhjtrbpx
 # 11-12 n: frpknnndpntnncnnnnn
 # 4-8 t: tmttdtnttkr
-f = File.new("input.txt")
+f = File.new('input.txt')
 passwords = f.readlines.map { |l| Password.new(l) }
 puts passwords.count(&:valid1?)
 puts passwords.count(&:valid2?)

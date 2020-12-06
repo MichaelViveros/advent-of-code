@@ -1,23 +1,25 @@
-# passport is a hash of fields, ex. {'ecl' => 'grey', 'pid' => '123', ...}
+# passport is a hash of fields, ex. {'ecl' => 'grey',
+# 'pid' => '123', ...}
 
-def has_all_fields(passport)
+def all_fields?(passport)
   all_fields = passport.keys.length == 8
   missing_cid = passport.keys.length == 7 && !passport.key?('cid')
   all_fields || missing_cid
 end
 
-def count_valid(passports) 
-  passports.count { |p| has_all_fields(p) }
+def count_valid(passports)
+  passports.count { |p| all_fields?(p) }
 end
 
-def has_all_fields_strict(p)
-  return false unless has_all_fields(p)
+def all_fields_strict?(p)
+  return false unless all_fields?(p)
   return false unless p['byr'].to_i.between?(1920, 2002)
   return false unless p['iyr'].to_i.between?(2010, 2020)
   return false unless p['eyr'].to_i.between?(2020, 2030)
 
   hgt_regex_match = /^([0-9]+)(cm|in)$/.match(p['hgt'])
   return false unless hgt_regex_match
+
   number = hgt_regex_match[1].to_i
   units = hgt_regex_match[2]
   return false if units == 'cm' && !number.between?(150, 193)
@@ -27,15 +29,15 @@ def has_all_fields_strict(p)
   return false unless /^(amb|blu|brn|gry|grn|hzl|oth)$/ =~ p['ecl']
   return false unless /^[0-9]{9}$/ =~ p['pid']
 
-  return true
+  true
 end
 
 def count_valid_strict(passports)
-  passports.count { |p| has_all_fields_strict(p) }
+  passports.count { |p| all_fields_strict?(p) }
 end
 
 data = ''
-open("input.txt") do |f|
+open('input.txt') do |f|
   # read the whole file into a string so we can split
   # it by the empty lines ("\n\n")
   data = f.read
@@ -54,7 +56,8 @@ passports = data.split("\n\n").map do |multiline_passport|
   # kv_pairs is a 2-D list where each element is a list of size 2
   # containing the key and value for that field
   # .to_h will convert the 2-D list to a hash
-  # Ex. [['ecl, 'grey'], ['pid', '123']] -> {'ecl' => 'grey', 'pid' => '123'}
+  # Ex. [['ecl, 'grey'], ['pid', '123']] ->
+  # {'ecl' => 'grey', 'pid' => '123'}
   kv_pairs = fields.map { |field| field.split(':') }
   kv_pairs.to_h
 end
