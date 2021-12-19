@@ -1,6 +1,4 @@
-const { match } = require('assert');
 const fs = require('fs')
-const _ = require('lodash');
 
 const lines = fs.readFileSync('input.txt')
   .toString()
@@ -11,8 +9,8 @@ const lines = fs.readFileSync('input.txt')
 // Convert numbers from binary to decimal.
 // Get least significant bit by checking if number is odd or even.
 // Count the number of 1 bits and check if 1 is more common than 0.
-function part1(lines) {
-  const ints = lines.map((line) => parseInt(line, 2))
+function solvePart1(lines) {
+  const ints = lines.map(line => parseInt(line, 2))
   const numBits = lines[0].length
   const numNumbers = ints.length
   let num1s = 0
@@ -41,29 +39,29 @@ function part1(lines) {
   console.log(gammaInt * epsilonInt)
 }
 
-part1(lines)
+solvePart1(lines)
 
 // Part 2:
-function part2(lines) {
-  const ints = lines.map((line) => parseInt(line, 2))
+function solvePart2(lines) {
+  const ints = lines.map(line => parseInt(line, 2))
   const numBits = lines[0].length
-  const oxygenRating = rating({ints, numBits, matchMostCommon: true})
-  const cO2Rating = rating({ints, numBits, matchMostCommon: false})
+  const oxygenRating = getRating({ints, numBits, matchMostCommon: true})
+  const cO2Rating = getRating({ints, numBits, matchMostCommon: false})
   console.log(oxygenRating * cO2Rating)
 }
 
-function rating({ints, numBits, matchMostCommon}) {
-  // make a mask to isolate the most significant bit
-  let mask = 2**(numBits - 1)
+function getRating({ints, numBits, matchMostCommon}) {
+  let bitIndex = numBits - 1
   while (ints.length > 1) {
-    ints = filterInts({ints, matchMostCommon, mask})
-    // move on to the next most significant bit
-    mask /= 2
+    ints = filterInts({ints, bitIndex, matchMostCommon})
+    bitIndex--
   }
   return ints[0]
 }
 
-function filterInts({ints, matchMostCommon, mask}) {
+function filterInts({ints, bitIndex, matchMostCommon}) {
+  // make a mask to isolate the bit at bitIndex
+  let mask = 2**bitIndex
   let num1s = 0
   for (int of ints) {
     num1s += isolateBit({int, mask}) % 2
@@ -74,13 +72,11 @@ function filterInts({ints, matchMostCommon, mask}) {
   } else {
     matchingBit = matchMostCommon ? 0 : 1
   }
-  return ints.filter((int) => {
-    return isolateBit({int, mask}) == matchingBit
-  })
+  return ints.filter(int => isolateBit({int, mask}) == matchingBit)
 }
 
 function isolateBit({int, mask}) {
   return (int & mask) == 0 ? 0 : 1
 }
 
-part2(lines)
+solvePart2(lines)
