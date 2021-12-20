@@ -14,5 +14,6 @@ module.exports = {
     radix: ['off'],
     'no-console': ['off'],
     'no-bitwise': ['off'],
+    'no-unused-vars': ["error", { "varsIgnorePattern": "^_" }],
   },
 };
