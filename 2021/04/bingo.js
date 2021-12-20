@@ -4,10 +4,11 @@ const _ = require('lodash');
 // INPUT PARSING
 
 // parseBoards returns [Board]
-// Board: { 
-//   nums: [BoardNum], 
-//   rowsMarked: [Number], 
+// Board: {
+//   nums: [BoardNum],
+//   rowsMarked: [Number],
 //   columnsMarked: [Number],
+//   marked: Boolean,
 // }
 // BoardNum: {
 //   value: Number,
@@ -30,7 +31,9 @@ function parseBoards({ lines }) {
         });
       const rowsMarked = _.fill(Array(5), 0);
       const columnsMarked = _.fill(Array(5), 0);
-      return { nums, rowsMarked, columnsMarked };
+      return {
+        nums, rowsMarked, columnsMarked, marked: false,
+      };
     });
 }
 
@@ -50,6 +53,7 @@ function parseInput() {
 
 /* eslint-disable no-param-reassign */
 function markNum({ num, board }) {
+  if (board.marked) return false;
   const boardNum = board.nums.find((n) => n.value === num);
   if (boardNum) {
     boardNum.marked = true;
@@ -57,21 +61,27 @@ function markNum({ num, board }) {
     board.columnsMarked[boardNum.column] += 1;
     const rowCount = board.rowsMarked[boardNum.row];
     const columnCount = board.columnsMarked[boardNum.column];
-    if (rowCount === 5 || columnCount === 5) return true;
+    if (rowCount === 5 || columnCount === 5) {
+      board.marked = true;
+      return true;
+    }
   }
   return false;
 }
 /* eslint-enable no-param-reassign */
 
-function getWinningBoard({ numsDrawn, boards }) {
+function getWinningBoard({ numsDrawn, boards, pickFirstWinner }) {
   const turns = numsDrawn.flatMap(
     (num) => boards.map((board) => ({ num, board })),
   );
-  return turns.find(({ num, board }) => markNum({ num, board }));
+  if (pickFirstWinner) {
+    return turns.find(({ num, board }) => markNum({ num, board }));
+  }
+  return turns.reduce((prevTurn, turn) => markNum(turn) ? turn : prevTurn);
 }
 
-function solvePart1({ numsDrawn, boards }) {
-  const { num, board } = getWinningBoard({ numsDrawn, boards });
+function solve({ numsDrawn, boards, pickFirstWinner }) {
+  const { num, board } = getWinningBoard({ numsDrawn, boards, pickFirstWinner });
   const [_markedNums, unmarkedNums] = _.partition(
     board.nums,
     (boardNum) => boardNum.marked,
@@ -81,4 +91,7 @@ function solvePart1({ numsDrawn, boards }) {
 }
 
 const { numsDrawn, boards } = parseInput();
-solvePart1({ numsDrawn, boards });
+// Part 1
+solve({ numsDrawn, boards: _.cloneDeep(boards), pickFirstWinner: true });
+// Part 2
+solve({ numsDrawn, boards: _.cloneDeep(boards), pickFirstWinner: false });
