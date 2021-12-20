@@ -1,6 +1,20 @@
 const fs = require('fs');
 const _ = require('lodash');
 
+// INPUT PARSING
+
+// parseBoards returns [Board]
+// Board: { 
+//   nums: [BoardNum], 
+//   rowsMarked: [Number], 
+//   columnsMarked: [Number],
+// }
+// BoardNum: {
+//   value: Number,
+//   row: Number,
+//   column: Number,
+//   marked: Boolean,
+// }
 function parseBoards({ lines }) {
   return _.chunk(lines, 6)
     .map((board) => {
@@ -18,6 +32,18 @@ function parseBoards({ lines }) {
       const columnsMarked = _.fill(Array(5), 0);
       return { nums, rowsMarked, columnsMarked };
     });
+}
+
+function parseInput() {
+  const lines = fs.readFileSync('input.txt')
+    .toString()
+    .trim()
+    .split('\n');
+  const numsDrawn = lines[0]
+    .split(',')
+    .map((numStr) => parseInt(numStr));
+  const boards = parseBoards({ lines: lines.slice(1) });
+  return { numsDrawn, boards };
 }
 
 // PART 1
@@ -52,18 +78,6 @@ function solvePart1({ numsDrawn, boards }) {
   );
   const unmarkedSum = _.sumBy(unmarkedNums, (boardNum) => boardNum.value);
   console.log(unmarkedSum * num);
-}
-
-function parseInput() {
-  const lines = fs.readFileSync('input.txt')
-    .toString()
-    .trim()
-    .split('\n');
-  const numsDrawn = lines[0]
-    .split(',')
-    .map((numStr) => parseInt(numStr));
-  const boards = parseBoards({ lines: lines.slice(1) });
-  return { numsDrawn, boards };
 }
 
 const { numsDrawn, boards } = parseInput();
