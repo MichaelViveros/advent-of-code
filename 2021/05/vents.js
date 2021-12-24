@@ -49,31 +49,38 @@ function isVertical({ segment }) {
   return segment.start.x === segment.end.x;
 }
 
-/* eslint-disable no-param-reassign */
-function markSegment({ segment, grid, horizontal }) {
-  const start = horizontal ? segment.start.x : segment.start.y;
-  let end = horizontal ? segment.end.x : segment.end.y;
+function getRange({ start, end, lengthIfEqual }) {
   if (start < end) {
-    end += 1;
+    return _.range(start, end + 1);
+  } else if (start === end) {
+    return _.fill(Array(lengthIfEqual), end);
   } else {
-    end -= 1;
+    return _.range(start, end - 1);
   }
-  _.range(start, end).forEach((i) => {
-    const x = horizontal ? i : segment.start.x;
-    const y = horizontal ? segment.start.y : i;
-    grid[y][x] += 1;
+}
+
+/* eslint-disable no-param-reassign */
+function markSegment({ segment, grid }) {
+  const yLength = Math.abs(segment.start.y - segment.end.y) + 1;
+  const xLength = Math.abs(segment.start.x - segment.end.x) + 1;
+  const xs = getRange({
+    start: segment.start.x,
+    end: segment.end.x,
+    lengthIfEqual: yLength,
   });
+  const ys = getRange({
+    start: segment.start.y,
+    end: segment.end.y,
+    lengthIfEqual: xLength,
+  });
+  _.zip(xs, ys).forEach(([x, y]) => grid[y][x] += 1);
 }
 /* eslint-enable no-param-reassign */
 
 function markSegments({ segments }) {
   const grid = createGrid({ segments });
   segments.forEach((segment) => {
-    if (isHorizontal({ segment })) {
-      markSegment({ segment, grid, horizontal: true });
-    } else if (isVertical({ segment })) {
-      markSegment({ segment, grid, horizontal: false });
-    }
+    markSegment({ segment, grid });
   });
   return grid;
 }
@@ -83,9 +90,18 @@ function countOverlap({ grid }) {
 }
 
 function solvePart1({ segments }) {
+  const segmentsFiltered = segments.filter((segment) => {
+    return isHorizontal({ segment }) || isVertical({ segment });
+  })
+  const grid = markSegments({ segments: segmentsFiltered });
+  console.log(countOverlap({ grid }));
+}
+
+function solvePart2({ segments }) {
   const grid = markSegments({ segments });
   console.log(countOverlap({ grid }));
 }
 
 const segments = parseInput();
 solvePart1({ segments });
+solvePart2({ segments })
